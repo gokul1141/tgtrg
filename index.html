@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+ <head>
+	 <!--meta charset is encoding for html-->
+	<meta charset="UTF-8"/>
+	<!--view for the device-->
+    <meta name="viewport"content="width=device-width,initial-scale=1"/>
+    <title>
+       My map
+    </title>
+    <!--leaflet-->
+    <link rel="stylesheet" href="lib/leaflet/leaflet.css"/>
+    <script src="lib/leaflet/leaflet.js"></script>
+    <script src="data/countries.geojson"></script>
+      <script src="data/countries.geojson"></script>
+    <style type="text/css">
+		#map{ height:600px; width:100%}
+    </style>
+  
+</head>
+<body>
+	<h1>My Map</h1>
+	<!--create div element where map contain-->
+	<div id="map"></div>
+	<script>
+		// for reset function we have to set var countries layer at the top
+		var countrieslayer;
+		// function for highlight feature
+		function highlightFeature(e) {
+    var layer = e.target;
+
+    layer.setStyle({
+        weight: 3,
+        color: 'black',
+        fillOpacity: 0.7
+    });
+    
+	    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+        layer.bringToFront();
+    }
+}
+// function resect highlight
+function resetHighlight(e) {
+    countrieslayer.resetStyle(e.target);
+}
+	// function zoom feature	
+function zoomToFeature(e) {
+    map.fitBounds(e.target.getBounds());
+}
+// we have to set on each feature of the layer
+function onEachFeature(feature, layer) {
+    layer.on({
+        mouseover: highlightFeature,
+        mouseout: resetHighlight,
+        click: zoomToFeature
+    });
+}
+
+
+  //classifying the population data
+		
+        		function getCountryColor(POP_EST){
+				if(POP_EST > 100000000){
+					return 'red';
+				}else if(POP_EST > 50000000){
+					return 'blue';
+				}else{
+					return 'green';
+				}
+			}
+			
+		
+
+function style(feature) {
+    return {
+        fillColor : getCountryColor(feature.properties.POP_EST),
+        weight: 2,
+        opacity: 1,
+        color: 'white',
+        dashArray: '3',
+        fillOpacity: 0.7
+    };
+}
+
+
+		
+	//this is where i create a map 
+		var map = L.map('map').setView([48.8476, 40.3564],10);
+		googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
+    maxZoom: 20,
+    subdomains:['mt0','mt1','mt2','mt3']
+}).addTo(map);
+		
+
+		
+		//here i add geojson layer in the map
+		var countrieslayer = L.geoJSON(countries, {style: style, onEachFeature: onEachFeature}).addTo(map);
+
+
+		//smap.addLayer(countrieslayer);
+		map.fitBounds(countrieslayer.getBounds());
+	</script>
+</body>
+</html>
